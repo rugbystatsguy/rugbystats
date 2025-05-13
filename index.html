@@ -1,3 +1,4 @@
+<!-- START OF FULL HTML DOCUMENT -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -113,7 +114,7 @@
       margin-top: 10px;
     }
 
-    #matchTimer {
+    .match-timer {
       font-size: 20px;
       font-weight: bold;
       background-color: #eeeeee;
@@ -134,21 +135,6 @@
       0%, 100% { background-color: #fff0f0; }
       50% { background-color: #ffcccc; }
     }
-
-    #startHalfBtn {
-      font-size: 14px;
-      padding: 8px 12px;
-      background-color: #1976d2;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      height: 40px;
-    }
-
-    #startHalfBtn:hover {
-      background-color: #145ca8;
-    }
   </style>
 </head>
 <body>
@@ -161,16 +147,25 @@
     <input type="text" id="awayTeam" placeholder="Enter away team" />
     <label>Date:</label>
     <input type="date" id="gameDate" />
-    <label id="homeScoreLabel">Home Team Score:</label>
+    <label>Home Team Score:</label>
     <input type="text" id="homeScore" placeholder="Score for Home Team" />
-    <label id="awayScoreLabel">Away Team Score:</label>
+    <label>Away Team Score:</label>
     <input type="text" id="awayScore" placeholder="Score for Away Team" />
   </div>
 
+  <!-- First Half -->
   <div class="section">    
     <div class="timer-controls">
-      <div id="matchTimer">25:00</div>
-      <button id="startHalfBtn" onclick="startMatchCountdown()">Start Half</button>
+      <div id="matchTimer1" class="match-timer">25:00</div>
+      <button class="stat-button" onclick="startMatchCountdown('matchTimer1')">1st Half Start</button>
+    </div>
+  </div>
+
+  <!-- Second Half -->
+  <div class="section">    
+    <div class="timer-controls">
+      <div id="matchTimer2" class="match-timer">25:00</div>
+      <button class="stat-button" onclick="startMatchCountdown('matchTimer2')">2nd Half Start</button>
     </div>
   </div>
 
@@ -203,18 +198,18 @@
   <script>
     const penalties = [
       "Offside", "High Tackle", "Hands In", "Not Releasing", "Holding On",
-      "Side Entry", "Not Rolling", "Off Feet", "Diving Over", "Double Movement",
+      "Side Entry", "Not Rolling", "Off Feet", "Falling Over", "Double Movement",
       "Collapsing", "Early Scrum Push PK", "Early Scrum Push FK"
     ];
 
     const otherStats = [
-      "Knock-ons", "Lineouts Won", "Lineouts Lost", "Scrums Won", "Scrums Lost",
+      "Knock-ons", "Own Lineouts Won", "Own Lineouts Lost", "Own Scrums Won", "Own Scrums Lost",
       "Opp Lineouts Won", "Opp Scrums Won"
     ];
 
     const playerNames = [
       "Alex Cowan", "Bradley Zimbizi", "Caleb Gibson", "Daniel Wichall", "Ethan Wadsworth",
-      "Francois Jooste", "Inako Ntsomi", "Jack Kershaw", "Josiah Nevins-Selvadurai", "Juan Damon",
+      "Inako Ntsomi", "Jack Kershaw", "Josiah Nevins-Selvadurai", "Juan Damon",
       "Jude Heeger", "Kai Gebhard", "Kgosta Leon Jack", "Leo Pera", "Logan Tomlison",
       "Michael Theron", "Mohammad Hassen-Parker", "Neakail Wessels", "Noeh Oellerman", "Owen Widelski",
       "Paballo Sehlako", "Quinn Doig", "Rushtun Dickson", "Ryan Anderson", "Sanchez Manjinga",
@@ -225,15 +220,15 @@
     const actionHistory = [];
     const yellowCards = [];
     const yellowTimers = [];
+    const matchIntervals = {};
 
-    let matchTime = 1500; // 25 mins in seconds
-    let matchInterval = null;
+    function startMatchCountdown(timerId) {
+      if (matchIntervals[timerId]) return;
 
-    function startMatchCountdown() {
-      const timer = document.getElementById("matchTimer");
-      if (matchInterval) return;
+      let matchTime = 1500;
+      const timer = document.getElementById(timerId);
 
-      matchInterval = setInterval(() => {
+      matchIntervals[timerId] = setInterval(() => {
         const absTime = Math.abs(matchTime);
         const min = String(Math.floor(absTime / 60)).padStart(2, '0');
         const sec = String(absTime % 60).padStart(2, '0');
@@ -304,7 +299,6 @@
 
     function startYellowCardTimer(playerName) {
       const container = document.getElementById("yellowCardTimerContainer");
-
       const timerBox = document.createElement("div");
       timerBox.className = "yellow-timer-box";
       timerBox.innerHTML = `<strong>${playerName}</strong><span>05:00</span>`;
@@ -376,9 +370,7 @@
         const container = document.getElementById("yellowCardTimerContainer");
         const boxes = Array.from(container.getElementsByClassName("yellow-timer-box"));
         const box = boxes.find(b => b.textContent.includes(player));
-        if (box) {
-          container.removeChild(box);
-        }
+        if (box) container.removeChild(box);
       } else if (stats[last] > 0) {
         stats[last]--;
       }
